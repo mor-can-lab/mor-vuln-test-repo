@@ -1,0 +1,21 @@
+# Build outputs
+bin/
+obj/
+build/
+dist/
+target/
+out/
+*.class
+*.o
+*.exe
+
+# Dependencies
+node_modules/
+vendor/bundle/
+
+# Local files
+.env
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

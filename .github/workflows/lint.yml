@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lightweight lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check line endings and trailing whitespace
+        run: |
+          ! git grep -n $'\r'
+          ! git grep -n '[[:blank:]]$'
+
+      - name: Check Python syntax
+        run: python -m py_compile samples/python/app.py
+
+      - name: Check JavaScript syntax
+        run: node --check samples/node/index.js
+
+      - name: Check Ruby syntax
+        run: ruby -c samples/ruby/app.rb
+
+      - name: Check Go formatting
+        run: test -z "$(gofmt -l samples/go)"
+
+      - name: Check Rust formatting
+        run: cargo fmt --manifest-path samples/rust/Cargo.toml --check

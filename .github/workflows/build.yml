@@ -1,0 +1,83 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build samples
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build C# console
+        run: dotnet build samples/csharp-console --configuration Release
+
+      - name: Build C# web
+        run: dotnet build samples/csharp-web --configuration Release
+
+      - name: Check Python
+        run: python -m py_compile samples/python/app.py
+
+      - name: Check Node.js
+        run: node --check samples/node/index.js
+
+      - name: Build Java
+        run: mvn -q -f samples/java/pom.xml test
+
+      - name: Test Go
+        working-directory: samples/go
+        run: go test ./...
+
+      - name: Build TypeScript
+        working-directory: samples/typescript
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+
+      - name: Check Ruby
+        run: ruby -c samples/ruby/app.rb
+
+      - name: Test Rust
+        run: cargo test --manifest-path samples/rust/Cargo.toml
+
+      - name: Build C++
+        run: |
+          cmake -S samples/cpp -B samples/cpp/build
+          cmake --build samples/cpp/build
