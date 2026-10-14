@@ -19,3 +19,7 @@ vendor/bundle/
 Thumbs.db
 .idea/
 .vscode/
+
+# Defender scan outputs
+defender-*.sarif
+defender-*.html
